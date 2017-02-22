@@ -1,11 +1,13 @@
 #!/bin/bash
-# https://github.com/markus-perl/ffmpeg-build-script
+REALPATH=$(realpath $0)
+DIRNAME=$(dirname $REALPATH)
+
 export CFLAGS='-O2'
 set -xe
 apt install automake
 
 VERSION=0.7
-PACKAGES=$(pwd)"/packages" 
+PACKAGES="/home/setup/ffmpeg" 
 WORKSPACE="/home/soft/ffmpeg"
 CC=clang
 LDFLAGS="-L${WORKSPACE}/lib -lm" 
@@ -132,9 +134,9 @@ case "$1" in
   "--build")
     ;;
   "--rebuild")
-    rm -rf $WORKSPACE
-    rm -rf $PACKAGES/*done;
-    find $PACKAGES -maxdepth 1 ! -path $PACKAGES  -type d |xargs -i rm -rf {}
+    #rm -rf $WORKSPACE
+    #rm -rf $PACKAGES/*done;
+    #find $PACKAGES -maxdepth 1 ! -path $PACKAGES  -type d |xargs -i rm -rf {}
     cd $PACKAGES
     ls *bz2 |xargs -i tar jxvf {}
     ls *gz |xargs -i tar zxvf {}
@@ -316,6 +318,20 @@ if build "fdk_aac"; then
 	build_done "fdk_aac"
 fi
 
+if build "speex"; then
+	download "http://downloads.xiph.org/releases/speex/speex-1.2.0.tar.gz" "speex-1.2.0.tar.gz"
+	cd $PACKAGES/speex-1.2.0 || exit
+	execute ./configure --prefix=${WORKSPACE} --disable-shared --enable-static
+	execute make -j $MJOBS
+	execute make install
+	build_done "speex"
+fi
+
+if build "tspx2wav"; then
+  cp -a $DIRNAME/tspx2wav $PACKAGES
+  cd $PACKAGES/tspx2wav && ./install.sh
+	build_done "tspx2wav"
+fi
 
 build "ffmpeg"
 download "http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 " "ffmpeg-snapshot.tar.bz2 "
@@ -346,6 +362,7 @@ execute ./configure  --arch=64 --prefix=${WORKSPACE} --extra-cflags="-I$WORKSPAC
 	--enable-libopencore_amrwb \
 	--enable-libopencore_amrnb \
 	--enable-filters \
+	--enable-libspeex \
 	--enable-libvidstab 
 	# enable all filters
 	# enable AAC de/encoding via libfdk-aac [no]

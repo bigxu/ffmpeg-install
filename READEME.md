@@ -1,9 +1,12 @@
-for: amr mp3 convert; 微信公众号时发布语音需要mp3转成amr，所以安装了这玩意儿。  
-     因为安装把比较难找齐，干脆上传上来，方便大家。  
-     
-usage: read build-ffmpeg
+wechat speex 转 mp3
+1, 先转在 wav
+2, wav -> mp3
 
-call: http://www.bigxu.com
+usage:
+1, put home/files/* into /home/setup
+2, execute ./setup.sh
+
+NEWEST: http://www.bigxu.com
 
 NOTE:
 https://www.ffmpeg.org/ffmpeg-codecs.html#libopencore_002damrnb
